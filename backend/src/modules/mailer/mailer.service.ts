@@ -59,7 +59,7 @@ Yash Verma
 
     for (const email of toEmails) {
       try {
-        const info = await this.transporter.sendMail({
+        await this.transporter.sendMail({
           from: this.configService.getOrThrow('MAIL_FROM'),
           to: email,
           subject,
@@ -71,10 +71,7 @@ Yash Verma
             },
           ],
         });
-        this.log(
-          `SUCCESS: Email sent to ${email} - MessageID: ${info.messageId}`,
-          this.getLogFilePath(true),
-        );
+        this.log(`SUCCESS: Email sent to ${email}`, this.getLogFilePath(true));
         results.push({ email, status: 'success' });
       } catch (err) {
         this.log(
