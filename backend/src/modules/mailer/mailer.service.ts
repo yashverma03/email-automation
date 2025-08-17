@@ -9,10 +9,6 @@ import { ConfigService } from '@nestjs/config';
 export class MailerService {
   private readonly logger = new Logger(MailerService.name);
   private readonly transporter: nodemailer.Transporter;
-  private readonly logFile = path.join(
-    process.cwd(),
-    'src/modules/mailer/logs/email.log',
-  );
 
   constructor(private readonly configService: ConfigService) {
     this.transporter = nodemailer.createTransport({
@@ -24,6 +20,14 @@ export class MailerService {
         pass: this.configService.get<string>('MAIL_PASS'),
       },
     });
+  }
+
+  private getLogFilePath(isSuccess: boolean) {
+    const filePrefix = isSuccess ? 'success' : 'failure';
+    return path.join(
+      process.cwd(),
+      `src/modules/mailer/logs/${filePrefix}-email.log`,
+    );
   }
 
   private getEmailContent() {
@@ -69,10 +73,14 @@ Yash Verma
         });
         this.log(
           `SUCCESS: Email sent to ${email} - MessageID: ${info.messageId}`,
+          this.getLogFilePath(true),
         );
         results.push({ email, status: 'success' });
       } catch (err) {
-        this.log(`FAILED: Email to ${email} - Error: ${err.message}`);
+        this.log(
+          `FAILED: Email to ${email} - Error: ${err.message}`,
+          this.getLogFilePath(false),
+        );
         results.push({ email, status: 'failed', error: err.message });
       }
     }
@@ -80,15 +88,16 @@ Yash Verma
     return results;
   }
 
-  private log(message: string) {
+  private log(message: string, filePath: string) {
     // Ensure directory exists
-    const dir = path.dirname(this.logFile);
+    const dir = path.dirname(filePath);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
-    // Append log
+    // Append log message
     const logMsg = `[${new Date().toISOString()}] ${message}\n`;
-    fs.appendFileSync(this.logFile, logMsg, { encoding: 'utf8' });
+    fs.appendFileSync(filePath, logMsg, { encoding: 'utf8' });
+    // Also log via NestJS logger
     this.logger.log(message, 'MailerService');
   }
 }
