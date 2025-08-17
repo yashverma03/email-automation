@@ -29,20 +29,20 @@ export class MailerService {
   private getEmailContent() {
     const subject = 'Exploring Software Engineering Opportunities';
     const text = `
-      Hi,
+Hi,
 
-      I am currently working as a Software Engineer at Oats Tech with 1.3 years of hands-on experience in full-stack web development. Over this period, I have contributed to a variety of impactful projects, including Property Management application, AI-powered chrome extension, Content Management System (CMS), Car Service Booking platform and Home Interior Design web application.
+I am currently working as a Software Engineer at Oats Tech with 1.3 years of hands-on experience in full-stack web development. Over this period, I have contributed to a variety of impactful projects, including Property Management application, AI-powered chrome extension, Content Management System (CMS), Car Service Booking platform and Home Interior Design web application.
 
-      I am proficient in full stack web development: frontend (HTML, CSS, JavaScript, Typescript, React.js), backend (Node.js, Express.js, Nest.js, Redis, Kafka), databases (PostgreSQL, MySQL, MongoDB) and devops (AWS, Docker, Linux).
+I am proficient in full stack web development: frontend (HTML, CSS, JavaScript, Typescript, React.js), backend (Node.js, Express.js, Nest.js, Redis, Kafka), databases (PostgreSQL, MySQL, MongoDB) and devops (AWS, Docker, Linux).
 
-      I'm reaching out to explore if there are any internal openings or upcoming roles in your team. I would be glad to connect and discuss how I can contribute to your team. Please find my resume attached for your reference.
+I'm reaching out to explore if there are any internal openings or upcoming roles in your team. I would be glad to connect and discuss how I can contribute to your team. Please find my resume attached for your reference.
 
-      Resume- https://drive.google.com/file/d/1_52R52MmukcObe3ZaWhOmkq3tUAA7hVi
+Resume- https://drive.google.com/file/d/1_52R52MmukcObe3ZaWhOmkq3tUAA7hVi
 
-      Best regards,
-      Yash Verma
-      📧 vermayash2003@gmail.com
-      📞 +91 8130957794
+Best regards,
+Yash Verma
+📧 vermayash2003@gmail.com
+📞 +91 8130957794
     `;
     return { subject, text };
   }
@@ -50,6 +50,8 @@ export class MailerService {
   async sendEmails(toEmails: string[]) {
     const results: EmailLog[] = [];
     const { subject, text } = this.getEmailContent();
+    const resumePath =
+      '/home/yash/yash-files/Documents/Job/Resume/Yash_Verma_Full_Stack_Resume.pdf';
 
     for (const email of toEmails) {
       try {
@@ -58,6 +60,12 @@ export class MailerService {
           to: email,
           subject,
           text,
+          attachments: [
+            {
+              filename: 'Yash_Verma_Full_Stack_Resume.pdf',
+              path: resumePath,
+            },
+          ],
         });
         this.log(
           `SUCCESS: Email sent to ${email} - MessageID: ${info.messageId}`,
