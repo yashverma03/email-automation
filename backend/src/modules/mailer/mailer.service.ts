@@ -3,6 +3,7 @@ import * as nodemailer from 'nodemailer';
 import * as fs from 'fs';
 import * as path from 'path';
 import { EmailLog } from './interfaces/email-log.interface';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class MailerService {
@@ -13,14 +14,14 @@ export class MailerService {
     'src/modules/mailer/logs/email.log',
   );
 
-  constructor() {
+  constructor(private readonly configService: ConfigService) {
     this.transporter = nodemailer.createTransport({
-      host: process.env.MAIL_HOST,
-      port: Number(process.env.MAIL_PORT),
-      secure: false, // true for 465, false for 587
+      host: this.configService.get<string>('MAIL_HOST'),
+      port: Number(this.configService.get<number>('MAIL_PORT')),
+      secure: Number(this.configService.get<number>('MAIL_PORT')) === 465, // true if port 465
       auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS,
+        user: this.configService.get<string>('MAIL_USER'),
+        pass: this.configService.get<string>('MAIL_PASS'),
       },
     });
   }
@@ -53,7 +54,7 @@ export class MailerService {
     for (const email of toEmails) {
       try {
         const info = await this.transporter.sendMail({
-          from: process.env.MAIL_FROM,
+          from: this.configService.getOrThrow('MAIL_FROM'),
           to: email,
           subject,
           text,
