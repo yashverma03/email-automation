@@ -8,7 +8,7 @@ import { EmailLog } from './interfaces/email-log.interface';
 export class MailerService {
   private readonly logger = new Logger(MailerService.name);
   private readonly transporter: nodemailer.Transporter;
-  private readonly logFile = path.join(__dirname, '../../email.log'); // adjust path if needed
+  private readonly logFile = path.join(__dirname, '..logs/email.log');
 
   constructor() {
     this.transporter = nodemailer.createTransport({
@@ -69,8 +69,15 @@ export class MailerService {
   }
 
   private log(message: string) {
+    // Ensure directory exists
+    const dir = path.dirname(this.logFile);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    // Append log
     const logMsg = `[${new Date().toISOString()}] ${message}\n`;
     fs.appendFileSync(this.logFile, logMsg, { encoding: 'utf8' });
+    // Also log via NestJS logger
     this.logger.log(message, 'MailerService');
   }
 }

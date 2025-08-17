@@ -7,8 +7,8 @@ import { EmailLog } from './interfaces/email-log.interface';
 export class MailerController {
   constructor(private readonly mailerService: MailerService) {}
 
-  @Post('send')
+  @Post()
   async sendEmails(@Body() body: SendEmailDto): Promise<EmailLog[]> {
-    return this.mailerService.sendEmails(body.toEmails);
+    return await this.mailerService.sendEmails(body.toEmails);
   }
 }
