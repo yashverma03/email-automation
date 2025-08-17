@@ -8,7 +8,10 @@ import { EmailLog } from './interfaces/email-log.interface';
 export class MailerService {
   private readonly logger = new Logger(MailerService.name);
   private readonly transporter: nodemailer.Transporter;
-  private readonly logFile = path.join(__dirname, '..logs/email.log');
+  private readonly logFile = path.join(
+    process.cwd(),
+    'src/modules/mailer/logs/email.log',
+  );
 
   constructor() {
     this.transporter = nodemailer.createTransport({
@@ -77,7 +80,6 @@ export class MailerService {
     // Append log
     const logMsg = `[${new Date().toISOString()}] ${message}\n`;
     fs.appendFileSync(this.logFile, logMsg, { encoding: 'utf8' });
-    // Also log via NestJS logger
     this.logger.log(message, 'MailerService');
   }
 }
